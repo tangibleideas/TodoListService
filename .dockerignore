@@ -1,0 +1,131 @@
+# Build outputs
+build/
+target/
+*.jar
+*.war
+*.class
+out/
+
+# Gradle files
+.gradle/
+**/build/
+gradle-wrapper.jar
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+.metadata/
+nbproject/
+.nb-gradle/
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+.gitmodules
+*.orig
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+*~
+
+# Documentation and non-essential files
+README*
+*.md
+LICENSE*
+CHANGELOG*
+docs/
+doc/
+*.txt
+*.pdf
+
+# Docker files (avoid recursion)
+Dockerfile*
+.dockerignore
+docker-compose*
+*.dockerfile
+
+# Test and development files
+test-*
+*test*
+*.sh
+*.bat
+*.cmd
+*.ps1
+
+# Logs and temporary files
+logs/
+*.log
+*.log.*
+tmp/
+temp/
+*.tmp
+*.temp
+*.cache
+*.pid
+*.seed
+*.coverage
+
+# Configuration files (environment-specific)
+application-local.*
+application-dev.*
+application-test.*
+*.properties.local
+*.yml.local
+*.yaml.local
+.env
+.env.*
+
+# Security and secrets
+*.key
+*.pem
+*.p12
+*.jks
+secrets/
+certs/
+
+# Coverage and analysis reports
+coverage/
+.nyc_output/
+sonar-project.properties
+.sonarqube/
+.scannerwork/
+
+# Backup and editor files
+*.bak
+*.backup
+*.swp
+*.swo
+*~
+.#*
+#*#
+
+# Application runtime
+*.pid
+*.log
+spring.log
+spring-boot.log
+heapdump*
+jvm.out
+hs_err_pid*
+
+# CI/CD files
+.github/
+.gitlab-ci.yml
+Jenkinsfile
+.travis.yml
+.circleci/
+azure-pipelines.yml
