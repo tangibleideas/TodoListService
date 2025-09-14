@@ -4,6 +4,7 @@ import com.tangibleideas.todolistservice.api.dto.AddTodoItemRequest;
 import com.tangibleideas.todolistservice.api.dto.TodoItemDTO;
 import com.tangibleideas.todolistservice.api.dto.UpdateTodoItemRequest;
 import com.tangibleideas.todolistservice.domain.TodoItem;
+import com.tangibleideas.todolistservice.domain.TodoItemId;
 import com.tangibleideas.todolistservice.domain.TodoItemStatus;
 import com.tangibleideas.todolistservice.mapper.TodoItemMapper;
 import com.tangibleideas.todolistservice.repository.TodoItemRepository;
@@ -15,6 +16,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -116,5 +118,30 @@ public class TodoItemService {
             todoItem.setStatus(status);
             todoItem.setDoneAt(null);
         }
+    }
+
+    public List<Long> getPastDueTodoItemIds() {
+        return todoItemRepository
+                .findByStatusAndDueAtBefore(
+                        TodoItemStatus.NOT_DONE,
+                        Instant.now())
+                .stream()
+                .map(TodoItemId::getId)
+                .collect(Collectors.toList());
+
+    }
+
+    @Transactional
+    public void setPastDueIfNotDone(Long id) {
+        int result = todoItemRepository.updateStatusWithStatusCondition(id,
+                                                                        TodoItemStatus.PAST_DUE,
+                                                                        TodoItemStatus.NOT_DONE);
+        if (result < 1) {
+            log.warn(
+                    "TodoItem with id {} not marked as PAST_DUE as current " +
+                    "status not NOT_DONE",
+                    id);
+        }
+
     }
 }
