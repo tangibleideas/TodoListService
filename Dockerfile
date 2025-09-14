@@ -12,8 +12,6 @@ RUN addgroup -g 1001 -S appgroup && \
 COPY --chown=appuser:appgroup gradle/ gradle/
 COPY --chown=appuser:appgroup gradlew build.gradle settings.gradle ./
 
-COPY --chown=appuser:appgroup config/ config/
-
 # Download dependencies (this layer will be cached unless build files change)
 RUN ./gradlew dependencies --no-daemon
 COPY --chown=appuser:appgroup src/ src/
