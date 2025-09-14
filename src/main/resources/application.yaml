@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:todolist
+    username: sa
+    driverClassName: org.h2.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 100
+      auto-commit: false
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+  h2:
+    console: true
+
+logging:
+  level:
+    org.hibernate.sql: DEBUG
+    org.hibernate.type: TRACE
+    org.springframework.transaction: TRACE
+    root: INFO
+
+server:
+  error:
+    include-exception: false
+    include-message: never
+    include-stacktrace: never
