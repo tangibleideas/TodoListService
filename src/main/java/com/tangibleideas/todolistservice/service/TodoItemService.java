@@ -6,6 +6,7 @@ import com.tangibleideas.todolistservice.api.dto.UpdateTodoItemRequest;
 import com.tangibleideas.todolistservice.domain.TodoItem;
 import com.tangibleideas.todolistservice.domain.TodoItemId;
 import com.tangibleideas.todolistservice.domain.TodoItemStatus;
+import com.tangibleideas.todolistservice.exception.StatusUpdateNotAllowedException;
 import com.tangibleideas.todolistservice.mapper.TodoItemMapper;
 import com.tangibleideas.todolistservice.repository.TodoItemRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +55,7 @@ public class TodoItemService {
      * Update TodoItem based on request only if database object requires update
      * 1. Fetch item from database ->
      * 2. Check if there are any updates ->
-     * 3. Only save to database if there are updates
+     * 3. Only save to database if there are updates and updates are allowed
      */
     @Transactional
     public Optional<TodoItemDTO> updateItem(
@@ -65,18 +66,14 @@ public class TodoItemService {
                 .map(existingTodoItem -> {
                     boolean isUpdated = false;
 
-                    // Check and update description if different and not null
-                    if (request.description() != null &&
-                        !Objects.equals(request.description(),
-                                        existingTodoItem.getDescription())) {
+                    if (isDescriptionUpdateRequired(request,
+                                                    existingTodoItem)) {
                         existingTodoItem.setDescription(request.description());
                         isUpdated = true;
                     }
 
-                    // Check and update status if different and not null
-                    if (request.status() != null &&
-                        !Objects.equals(request.status(),
-                                        existingTodoItem.getStatus())) {
+                    if (isStatusUpdateRequired(request, existingTodoItem)) {
+                        rejectStatusUpdateIfNeeded(existingTodoItem);
                         setStatusWithLogic(existingTodoItem, request.status());
                         isUpdated = true;
                     }
@@ -93,6 +90,36 @@ public class TodoItemService {
                         return todoItemMapper.toDTO(existingTodoItem);
                     }
                 });
+    }
+
+    private static boolean isDescriptionUpdateRequired(
+            UpdateTodoItemRequest request,
+            TodoItem existingTodoItem) {
+        return request.description() != null &&
+               !Objects.equals(request.description(),
+                               existingTodoItem.getDescription());
+    }
+
+    private static boolean isStatusUpdateRequired(
+            UpdateTodoItemRequest request,
+            TodoItem existingTodoItem) {
+        return request.status() != null &&
+               !Objects.equals(request.status(),
+                               existingTodoItem.getStatus());
+    }
+
+    /**
+     * Raise exception if status is past due and status update requested
+     *
+     */
+    private void rejectStatusUpdateIfNeeded(TodoItem existingTodoItem) {
+        if (existingTodoItem
+                .getStatus()
+                .equals(TodoItemStatus.PAST_DUE)) {
+            throw new StatusUpdateNotAllowedException(
+                    "status update of past due item " +
+                    existingTodoItem.getId() + " is not allowed");
+        }
     }
 
     public List<TodoItemDTO> getAllItems() {

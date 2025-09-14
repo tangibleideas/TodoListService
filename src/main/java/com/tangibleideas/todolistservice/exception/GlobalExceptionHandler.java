@@ -8,7 +8,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -39,16 +38,16 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageConversionException.class)
-    public ResponseEntity<RequestConversionErrorResponse> handleRequestDeserializationExceptions(
+    public ResponseEntity<ClientErrorResponse> handleRequestDeserializationExceptions(
             HttpMessageConversionException ex) {
         log.error(ex.getMessage(), ex);
-        RequestConversionErrorResponse errorResponse =
-                new RequestConversionErrorResponse(
+        ClientErrorResponse errorResponse =
+                new ClientErrorResponse(
                         HttpStatus.BAD_REQUEST.value(),
                         HttpStatus.BAD_REQUEST.getReasonPhrase(),
                         Instant.now(),
                         new ArrayList<>(
-                                Collections.singleton(new RequestConversionError(
+                                Collections.singleton(new ClientError(
                                         "request (uri, headers or payload)",
                                         "Malformed or not according to API " +
                                         "specifications"))));
@@ -56,25 +55,27 @@ public class GlobalExceptionHandler {
 
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<RequestConversionErrorResponse> handleArgumentTypeMismatchExceptions(
-            MethodArgumentTypeMismatchException ex) {
-        log.error(ex.getMessage(), ex);
-        RequestConversionErrorResponse errorResponse =
-                new RequestConversionErrorResponse(
-                        HttpStatus.BAD_REQUEST.value(),
-                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                        Instant.now(),
-                        new ArrayList<>(Collections.singleton(new RequestConversionError(
-                                "URI",
-                                "Invalid Parameter"))));
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
 
     private FieldValidationError mapToFieldValidationError(FieldError fieldError) {
         return new FieldValidationError(
                 fieldError.getRejectedValue(),
                 fieldError.getDefaultMessage());
+    }
+
+    @ExceptionHandler(StatusUpdateNotAllowedException.class)
+    public ResponseEntity<ClientErrorResponse> handleStatusUpdateNotAllowedException(
+            StatusUpdateNotAllowedException ex) {
+        log.error(ex.getMessage(), ex);
+        ClientErrorResponse errorResponse =
+                new ClientErrorResponse(
+                        HttpStatus.BAD_REQUEST.value(),
+                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                        Instant.now(),
+                        new ArrayList<>(
+                                Collections.singleton(new ClientError(
+                                        "status",
+                                        ex.getMessage()))));
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
 }
