@@ -1,4 +1,3 @@
 package com.tangibleideas.todolistservice.exception;
 
-public record FieldValidationError(Object value, String message) {
-}
+public record FieldValidationError(Object value, String message) {}
