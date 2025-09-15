@@ -22,6 +22,8 @@ logging:
 
 server:
   error:
+    whitelabel:
+      enabled: false
     include-exception: false
     include-message: never
     include-stacktrace: never
