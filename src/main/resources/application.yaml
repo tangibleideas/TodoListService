@@ -25,3 +25,8 @@ server:
     include-exception: false
     include-message: never
     include-stacktrace: never
+springdoc:
+  api-docs:
+    path: /api/docs
+  swagger-ui:
+    path: /swagger-ui.html
