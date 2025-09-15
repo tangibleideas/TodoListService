@@ -21,6 +21,7 @@ logging:
     root: INFO
 
 server:
+  port: 8080
   error:
     whitelabel:
       enabled: false
